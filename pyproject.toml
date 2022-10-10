@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "sketch-export-dxf"
+version = "0.0.1"
+description = ""
+authors = ["kobakazu0429 <kobakazu10@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ezdxf = "^0.18.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = {version = "^22.10.0", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
