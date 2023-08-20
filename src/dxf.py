@@ -1,5 +1,25 @@
-import ezdxf
-from ezdxf.addons import Importer
+import sys
+from .lib import fusion360utils as futil
+
+
+try:
+    import ezdxf
+    from ezdxf.addons import Importer
+except ImportError:
+    try:
+        import pathlib
+
+        site_packages_path = str(
+            pathlib.Path(__file__).parent.parent.joinpath("site-packages")
+        )
+        futil.log(site_packages_path)
+
+        if not site_packages_path in sys.path:
+            sys.path.append(site_packages_path)
+            import ezdxf
+            from ezdxf.addons import Importer
+    except:
+        futil.handle_error("install ezdxf !")
 
 
 def merge(dxf_files, output_dxf_path):

@@ -1,15 +1,5 @@
 import os
-
-import sys
 import tempfile
-
-
-_PATH = "/Users/kazu/Library/Application Support/Autodesk/Autodesk Fusion 360/API/AddIns/sketch-export-dxf/.venv/lib/python3.10/site-packages"
-
-if not _PATH in sys.path:
-    sys.path.append(_PATH)
-
-
 import adsk.core  # type: ignore
 from ... import dxf
 
