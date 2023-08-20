@@ -39,10 +39,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: |
-            LICENSE
-            README.md
-            sketch-export-dxf.manifest
-            sketch-export-dxf.py
-            src/*
-            site-packages/*
+          files: ${{ matrix.os }}.zip
