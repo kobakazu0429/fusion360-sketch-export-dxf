@@ -40,12 +40,12 @@ jobs:
       - name: Package for windows
         if: matrix.os == 'windows-latest'
         shell: powershell
-        run: Compress-Archive -Path dist/* -Destination ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
+        run: Compress-Archive -Path sketch-export-dxf/* -Destination ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
 
       - name: Package for macOS
         if: matrix.os == 'macos-latest'
         run: |
-          zip ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip -r dist
+          zip ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip -r sketch-export-dxf
 
       - name: Release
         uses: softprops/action-gh-release@v1
