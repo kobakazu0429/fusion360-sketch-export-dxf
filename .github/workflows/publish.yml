@@ -34,13 +34,13 @@ jobs:
           mkdir sketch-export-dxf
           mv LICENSE README.md sketch-export-dxf.manifest sketch-export-dxf.py sketch-export-dxf
           mv src sketch-export-dxf
-          mv site-packages/ sketch-export-dxf
+          mv site-packages sketch-export-dxf
           rm sketch-export-dxf/**/__pycache__/**
 
       - name: Package for windows
         if: matrix.os == 'windows-latest'
         shell: powershell
-        run: Compress-Archive -Path sketch-export-dxf/* -Destination ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
+        run: Compress-Archive -Path sketch-export-dxf -Destination ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
 
       - name: Package for macOS
         if: matrix.os == 'macos-latest'
