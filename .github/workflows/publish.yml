@@ -1,0 +1,36 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        python-version: ["3.9"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -t site-packages ezdxf==1.0.3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            LICENSE
+            README.md
+            sketch-export-dxf.manifest
+            sketch-export-dxf.py
+            src/*
+            site-packages/*
