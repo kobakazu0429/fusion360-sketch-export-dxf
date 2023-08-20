@@ -21,13 +21,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        shell: bash
+        run: pip install -t site-packages ezdxf==1.0.3
+      - name: Generate release tag
+        id: tag
         run: |
-          python -m pip install --upgrade pip
-          pip install -t site-packages ezdxf==1.0.3
+          echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
           files: |
             LICENSE
             README.md
