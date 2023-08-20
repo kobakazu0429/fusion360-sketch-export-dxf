@@ -21,11 +21,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: pip install -t site-packages ezdxf==1.0.3
+        run: python3 -m pip install -t site-packages ezdxf==1.0.3
       - name: Generate release tag
         id: tag
+        run: echo "release_tag=build_$(date +"%Y.%m.%d_%H-%M")" >> "$GITHUB_OUTPUT"
+
+      - name: Zip
+        shell: bash
         run: |
-          echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
+          mkdir ${{ steps.tag.outputs.release_tag }}
+          mv LICENSE README.md sketch-export-dxf.manifest sketch-export-dxf.py ${{ steps.tag.outputs.release_tag }}
+          mv src ${{ steps.tag.outputs.release_tag }}
+          mv site-packages/ ${{ steps.tag.outputs.release_tag }}
+          zip archive -r ${{ steps.tag.outputs.release_tag }}
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
