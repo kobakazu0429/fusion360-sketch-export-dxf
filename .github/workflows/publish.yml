@@ -43,7 +43,9 @@ jobs:
         id: tag
         shell: bash
         # run: echo "release_tag=build_$(date +"%Y.%m.%d_%H-%M")" >> "$GITHUB_OUTPUT"
-        run: echo "release_tag=${${{ github.sha }}:0:7}" >> "$GITHUB_OUTPUT"
+        run: |
+          STR=${{ github.sha }}
+          echo "release_tag=${STR:0:7}" >> "$GITHUB_OUTPUT"
 
       - name: dist
         shell: bash
