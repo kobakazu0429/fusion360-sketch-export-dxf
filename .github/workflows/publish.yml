@@ -42,7 +42,8 @@ jobs:
       - name: Generate release tag
         id: tag
         shell: bash
-        run: echo "release_tag=build_$(date +"%Y.%m.%d_%H-%M")" >> "$GITHUB_OUTPUT"
+        # run: echo "release_tag=build_$(date +"%Y.%m.%d_%H-%M")" >> "$GITHUB_OUTPUT"
+        run: echo "release_tag=${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
       - name: dist
         shell: bash
@@ -51,7 +52,7 @@ jobs:
           mv LICENSE README.md sketch-export-dxf.manifest sketch-export-dxf.py dist/sketch-export-dxf
           mv src dist/sketch-export-dxf
           mv site-packages dist/sketch-export-dxf
-          rm -rf dist/**/__pycache__
+          find dist -name "__pycache__" -type d | xargs rm -rf
 
       - name: Package for Linux
         if: runner.os == 'Linux'
