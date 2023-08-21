@@ -3,14 +3,14 @@ name: publish
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
         python-version: ["3.9"]
     runs-on: ${{ matrix.os }}
 
@@ -22,7 +22,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         shell: bash
-        run: python3 -m pip install -t site-packages ezdxf==1.0.3
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install \
+              --only-binary=:all: \
+              --platform any \
+              --python-version 39 \
+              --implementation py \
+              --abi none \
+              --target site-packages \
+              ezdxf==1.0.3
+          elif [ "$RUNNER_OS" == "Windows" ] || ["$RUNNER_OS" == "macOS"]; then
+            python3 -m pip install -t site-packages ezdxf==1.0.3
+          else
+            echo "$RUNNER_OS not supported"
+            exit 1
+          fi
+
       - name: Generate release tag
         id: tag
         shell: bash
@@ -31,24 +47,33 @@ jobs:
       - name: dist
         shell: bash
         run: |
-          mkdir sketch-export-dxf
-          mv LICENSE README.md sketch-export-dxf.manifest sketch-export-dxf.py sketch-export-dxf
-          mv src sketch-export-dxf
-          mv site-packages sketch-export-dxf
-          rm sketch-export-dxf/**/__pycache__/**
+          mkdir -p dist/sketch-export-dxf
+          mv LICENSE README.md sketch-export-dxf.manifest sketch-export-dxf.py dist/sketch-export-dxf
+          mv src dist/sketch-export-dxf
+          mv site-packages dist/sketch-export-dxf
+          rm -rf dist/**/__pycache__
 
-      - name: Package for windows
-        if: matrix.os == 'windows-latest'
-        shell: powershell
-        run: Compress-Archive -Path sketch-export-dxf -Destination ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
+      - name: Package for Linux
+        if: runner.os == 'Linux'
+        run: |
+          cd dist
+          zip universal-${{ steps.tag.outputs.release_tag }}.zip -r sketch-export-dxf
 
       - name: Package for macOS
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         run: |
-          zip ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip -r sketch-export-dxf
+          cd dist
+          zip mac-${{ steps.tag.outputs.release_tag }}.zip -r sketch-export-dxf
+
+      - name: Package for Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          cd dist
+          Compress-Archive -Path sketch-export-dxf -Destination windows-${{ steps.tag.outputs.release_tag }}.zip
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: ${{ matrix.os }}-${{ steps.tag.outputs.release_tag }}.zip
+          files: dist/*.zip
